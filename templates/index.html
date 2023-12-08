@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MobileNetV2 Image Classifier</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 50px;
+      }
+      h1 {
+        color: #333;
+      }
+      form {
+        margin-top: 20px;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      #result {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="mt-5">MobileNetV2 Image Classifier</h1>
+      <form
+      class="mt-4"
+      action="/predict"
+      method="post"
+      enctype="multipart/form-data"
+      id="upload-form"
+  >
+      <div class="custom-file">
+          <input
+              type="file"
+              class="custom-file-input"
+              id="customFile"
+              name="file"
+              accept="image/*"
+              required
+          />
+          <label class="custom-file-label" for="customFile">Choose image</label>
+      </div>
+      <button type="submit" class="btn btn-primary mt-3">Predict</button>
+  </form>
+  <div id="result" class="mt-4">
+      <!-- Hasil prediksi akan ditampilkan di sini -->
+  </div>
+  
+
+
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+      // Tangkap formulir pengunggahan gambar
+      const uploadForm = document.getElementById('upload-form');
+  
+      // Tangkap elemen hasil untuk memasukkan hasil prediksi
+      const resultDiv = document.getElementById('result');
+  
+      // Setel penanganan formulir pengunggahan
+      uploadForm.addEventListener('submit', function(event) {
+          event.preventDefault(); // Hindari formulir untuk dikirim secara normal
+  
+          // Dapatkan objek FormData dari formulir pengunggahan
+          const formData = new FormData(uploadForm);
+  
+          // Kirim permintaan POST asinkron menggunakan fetch
+          fetch('/predict', {
+              method: 'POST',
+              body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+              // Tampilkan hasil prediksi
+              resultDiv.innerHTML = `
+                  <h2>Prediction:</h2>
+                  <img src="static/uploads/${data.image_filename}" alt="Uploaded Image" class="img-fluid">
+                  <p class="lead">Class: ${data.predicted_class}</p>
+                  <p class="lead">Probability: ${data.probability}</p>
+              `;
+          })
+          .catch(error => {
+              // Tangani kesalahan jika ada
+              resultDiv.innerHTML = `
+                  <h2 class="text-danger">Error:</h2>
+                  <p class="text-danger">${error.message}</p>
+              `;
+          });
+      });
+  </script>
+  
+  </body>
+</html>
